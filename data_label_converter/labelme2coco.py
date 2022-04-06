@@ -1,4 +1,4 @@
-# labelme格式标注信息转换为coco格式标注信息
+# labelme格式标注数据集转换为coco格式标注数据集
 import json
 import os
 import random
@@ -42,9 +42,9 @@ class Labelme2COCO(object):
             self.coco_dir, "val{}".format(self.coco_year))
         self.coco_ann_dir = os.path.join(self.coco_dir, "annotations")
         self.coco_ann_file_train = os.path.join(
-            self.coco_ann_dir, "instances_{}_train.json".format(self.coco_year))
+            self.coco_ann_dir, "instances_train{}.json".format(self.coco_year))
         self.coco_ann_file_val = os.path.join(
-            self.coco_ann_dir, "instances_{}_val.json".format(self.coco_year))
+            self.coco_ann_dir, "instances_val{}.json".format(self.coco_year))
 
         self.dict_name_id = {}
         for i, class_name in enumerate(self.class_names):
@@ -160,6 +160,7 @@ class Labelme2COCO(object):
             "date_captured": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
             "height": img_resize_pad.shape[0],
             "width": img_resize_pad.shape[1],
+            "file_name": save_img_name,
             "id": self.coco_image_id})
         cv2.imencode('.jpg', img_resize_pad)[1].tofile(save_img_path)
         self.coco_image_id += 1
@@ -197,8 +198,8 @@ class Labelme2COCO(object):
                     "image_id": self.coco_image_id,
                     "id": self.coco_annotation_id,
                     "category_id": self.dict_name_id[shape['label']],
-                    "area": (xmax - xmin) * (ymax - ymin),
                     "bbox": [xmin, ymin, xmax - xmin, ymax - ymin],
+                    "area": (xmax - xmin) * (ymax - ymin),
                     "segmentation": segm})
                 self.coco_annotation_id += 1
 
@@ -223,8 +224,8 @@ class Labelme2COCO(object):
 
         coco_dict_data['images'] = self.coco_images
         coco_dict_data['annotations'] = self.coco_annotations
-        with open(save_json_path, 'w') as f:
-            json.dump(coco_dict_data, f)
+        with open(save_json_path, 'w', encoding='utf-8') as f:
+            json.dump(coco_dict_data, f, indent=4)
         print("====", save_json_path, "json saved.")
 
     def run(self):
