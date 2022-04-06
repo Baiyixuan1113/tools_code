@@ -185,11 +185,11 @@ class Labelme2COCO(object):
 
                 points[:, 0] = points[:, 0] * scale + pad_left
                 points[:, 1] = points[:, 1] * scale + pad_top
-                xmin = points[:, 0].min()
-                xmax = points[:, 0].max()
-                ymin = points[:, 1].min()
-                ymax = points[:, 1].max()
-                segm = points.reshape(1, -1)
+                xmin = float(points[:, 0].min())
+                xmax = float(points[:, 0].max())
+                ymin = float(points[:, 1].min())
+                ymax = float(points[:, 1].max())
+                segm = points.reshape(1, -1).tolist()
                 if (xmax == xmin) or (ymax == ymin):
                     continue
                 self.coco_annotations.append({
@@ -199,7 +199,7 @@ class Labelme2COCO(object):
                     "category_id": self.dict_name_id[shape['label']],
                     "area": (xmax - xmin) * (ymax - ymin),
                     "bbox": [xmin, ymin, xmax - xmin, ymax - ymin],
-                    "segmentation": segm.tolist()})
+                    "segmentation": segm})
                 self.coco_annotation_id += 1
 
     def to_coco(self, img_paths, is_training):
@@ -305,14 +305,14 @@ if __name__ == "__main__":
         coco_year: coco数据集的年份(默认2017)
         train_ratio: 训练集和验证集的比例(默认0.9090)
         get_rotate_path: 是否获取旋转后的图片路径, 如下例:
-                (/a/b/c.jpg -> /a/b_rotate/c_r90.jpg, /a/b_rotate/c_r180.jpg, /a/b_rotate/c_r270.jpg)
+                (a/b/c.jpg -> a/b_rotate/c_r90.jpg, a/b_rotate/c_r180.jpg, a/b_rotate/c_r270.jpg)
         do_resize: 是否进行图片的resize
         target_shape: 如果图片进行resize, 则指定目标图片的大小(h, w)
     """
     # -----------------------------印章、条码、二维码、手写签名-----------------------------
-    folders = ["/a/b/c/labelme_data",
-                        "/a/b/c/labelme_data_new"]
-    coco_dir = "a/b/c/coco"
+    folders = ["/aa/bb/labelme_data",
+                        "/aa/bb/labelme_data_new"]
+    coco_dir = "/aa/bb/coco_data"
     coco_year = "2017"
     class_names = ['Seal', 'QRcode', 'Barcode', 'HWSign']
     train_ratio = 0.9090
