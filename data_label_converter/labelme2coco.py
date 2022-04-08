@@ -163,7 +163,6 @@ class Labelme2COCO(object):
             "file_name": save_img_name,
             "id": self.coco_image_id})
         cv2.imencode('.jpg', img_resize_pad)[1].tofile(save_img_path)
-        self.coco_image_id += 1
 
         # ----------处理标注信息文件----------
         json_path = os.path.splitext(img_path)[0]+'.json'
@@ -202,6 +201,7 @@ class Labelme2COCO(object):
                     "area": (xmax - xmin) * (ymax - ymin),
                     "segmentation": segm})
                 self.coco_annotation_id += 1
+        self.coco_image_id += 1
 
     def to_coco(self, img_paths, is_training):
         coco_dict_data = {}
